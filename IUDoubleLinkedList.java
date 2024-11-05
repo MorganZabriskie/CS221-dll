@@ -231,6 +231,7 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
             tail.setNext(null);
         } else { // somewhere in the middle
             previous.setNext(current.getNext());
+            current.getNext().setPrev(previous);
         }
 
         size--;
@@ -259,13 +260,14 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
                 targetNode = currNode;
                 currNode = currNode.getNext();
             }
-            returnElement = currNode.getElement(); //check if this should be target node or current node
+            returnElement = currNode.getElement();
             
             if (currNode == tail) { // check if tail needs to be updated
                 targetNode.setNext(null);
                 tail = targetNode;
             } else {
                 targetNode.setNext(currNode.getNext());
+                currNode.getNext().setPrev(targetNode);
             }
             size--;
             modCount++;
@@ -399,7 +401,7 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
 
     @Override
     public Iterator<T> iterator() {
-        Iterator<T> newIterator = new SLLIterator<T>();
+        Iterator<T> newIterator = new DLLIterator<T>();
         return newIterator;
     }
 
@@ -413,8 +415,8 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
         throw new UnsupportedOperationException();
     }
 
-    /** Iterator for IUSingleLinkedList */
-    private class SLLIterator<E extends T> implements Iterator<T> {
+    /** Iterator for IUDoubleLinkedList */
+    private class DLLIterator<E extends T> implements Iterator<T> {
         private boolean nextCalled = false;
         private Node<T> nextNode;
         private Node<T> prevNode;
@@ -422,7 +424,7 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
         private int index = -1;
 
         /** Creates a new iterator for the list */
-        public SLLIterator() {
+        public DLLIterator() {
             nextNode = head;
             this.iterModCount = modCount;
         }
@@ -501,12 +503,8 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
                         iterModCount++;
                         nextCalled = false;
                     } else {
-                        Node<T> targetNode = head;
-                        for (int i = 1; i < index; i++) {
-                            targetNode = targetNode.getNext();
-                        }
-                        targetNode.setNext(prevNode.getNext());
-                        prevNode.setNext(null);
+                        prevNode.getPrev().setNext(prevNode.getNext());
+                        prevNode.getNext().setPrev(prevNode.getPrev());
                         size--;
                         index--;
                         modCount++;
