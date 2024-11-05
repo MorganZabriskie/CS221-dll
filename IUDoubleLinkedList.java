@@ -18,7 +18,7 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
     private int size;
     private int modCount;
 
-    /** Constructor for the IUSingleLinkedList class
+    /** Constructor for the IUDoubleLinkedList class
      * Instantiates the head, tail, size, and modCount
      * Creates an empty list */
     public IUDoubleLinkedList() {
