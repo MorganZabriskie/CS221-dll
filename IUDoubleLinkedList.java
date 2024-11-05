@@ -38,6 +38,7 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
         } else {
             Node<T> newNode = new Node<T>(element);
             newNode.setNext(head);
+            head.setPrev(newNode);
             head = newNode;
             size++;
             modCount++;
@@ -189,6 +190,13 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
     public T removeLast() {
         if (size == 0) {
             throw new NoSuchElementException();
+        } else if (size == 1) {
+            T returnElement = tail.getElement();
+            tail = null;
+            head = null;
+            size--;
+            modCount++;
+            return returnElement;
         } else {
             T returnElement = tail.getElement();
             tail.getPrev().setNext(null);
