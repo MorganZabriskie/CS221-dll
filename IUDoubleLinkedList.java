@@ -618,14 +618,26 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
 
         @Override
         public int nextIndex() {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'nextIndex'");
+            int nextIndex;
+            if (nextNode == null) {
+                nextIndex = size;
+            } else {
+                nextIndex = index + 1;
+            }
+
+            return nextIndex;
         }
 
         @Override
         public int previousIndex() {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'previousIndex'");
+            int prevIndex;
+            if (prevNode == null) {
+                prevIndex = -1;
+            } else {
+                prevIndex = index;
+            }
+
+            return prevIndex;
         }
 
         @Override
