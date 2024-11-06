@@ -528,6 +528,7 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
     private class DLLListIterator<E extends T> implements ListIterator<T> {
         //instance variables
         private boolean nextCalled = false;
+        private boolean prevCalled = false;
         private Node<T> nextNode;
         private Node<T> prevNode;
         private int iterModCount;
@@ -575,6 +576,7 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
                     prevNode = prevNode.getNext();
                     nextNode = nextNode.getNext();
                     
+                    nextCalled = true;
                     return next;
                 }
             }
@@ -582,14 +584,36 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
 
         @Override
         public boolean hasPrevious() {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'hasPrevious'");
+            boolean hasPrevious = false;
+            if (index == -1) {
+                hasPrevious = false;
+            } else {
+                if(prevNode == null) {
+                    hasPrevious = false;
+                } else {
+                    hasPrevious = true;
+                }
+            }
+            return hasPrevious;
         }
 
         @Override
         public T previous() {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'previous'");
+            if(size == 0) {
+                throw new NoSuchElementException();
+            } else {
+                if (prevNode == null) {
+                    throw new NoSuchElementException();
+                } else {
+                    T previous = prevNode.getElement();
+                    index--;
+                    nextNode = prevNode;
+                    prevNode = prevNode.getPrev();
+
+                    prevCalled = true;
+                    return previous;
+                }
+            }
         }
 
         @Override
