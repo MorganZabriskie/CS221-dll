@@ -415,7 +415,8 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
 
     @Override
     public ListIterator<T> listIterator() {
-        throw new UnsupportedOperationException();
+        ListIterator<T> newListIterator = new DLLListIterator<T>();
+        return newListIterator;
     }
 
     @Override
@@ -523,4 +524,101 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
             }
         }
     }
+
+    private class DLLListIterator<E extends T> implements ListIterator<T> {
+        //instance variables
+        private boolean nextCalled = false;
+        private Node<T> nextNode;
+        private Node<T> prevNode;
+        private int iterModCount;
+        private int index = -1;
+
+        /**
+         * Constructor for ListIterator
+         */
+        public DLLListIterator() {
+            nextNode = head;
+            iterModCount = modCount;
+        }
+
+        @Override
+        public boolean hasNext() {
+            boolean hasNext = false;
+            if (size == 0) {
+                hasNext = false;
+            } else if (index == -1) {
+                if(head == null) {
+                    hasNext = false;
+                } else {
+                    hasNext = true;
+                }
+            } else {
+                if (nextNode == null) {
+                    hasNext = false;
+                } else {
+                    hasNext = true;
+                }
+            }
+            return hasNext;
+        }
+
+        @Override
+        public T next() {
+            if (size == 0) {
+                throw new NoSuchElementException();
+            } else {
+                if (nextNode == null) {
+                    throw new NoSuchElementException();
+                } else {
+                    T next = nextNode.getElement();
+                    index++;
+                    prevNode = prevNode.getNext();
+                    nextNode = nextNode.getNext();
+                    
+                    return next;
+                }
+            }
+        }
+
+        @Override
+        public boolean hasPrevious() {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'hasPrevious'");
+        }
+
+        @Override
+        public T previous() {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'previous'");
+        }
+
+        @Override
+        public int nextIndex() {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'nextIndex'");
+        }
+
+        @Override
+        public int previousIndex() {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'previousIndex'");
+        }
+
+        @Override
+        public void remove() {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'remove'");
+        }
+
+        @Override
+        public void set(T e) {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'set'");
+        }
+
+        @Override
+        public void add(T e) {
+            // TODO Auto-generated method stub
+            throw new UnsupportedOperationException("Unimplemented method 'add'");
+        }
 }
