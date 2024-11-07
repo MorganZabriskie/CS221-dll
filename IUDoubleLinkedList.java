@@ -624,6 +624,7 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
                         
                         removeCalled = false;
                         addCalled = false;
+                        prevCalled = false;
                         nextCalled = true;
                         return next;
                     }
@@ -676,6 +677,7 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
                         }
 
                         prevCalled = true;
+                        nextCalled = false;
                         removeCalled = false;
                         addCalled = false;
                         return previous;
