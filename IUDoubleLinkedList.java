@@ -576,7 +576,11 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
                     T next = nextNode.getElement();
                     index++;
                     prevNode = prevNode.getNext();
-                    nextNode = nextNode.getNext();
+                    if(nextNode == tail) { // going to back of list
+                        nextNode = null;
+                    } else {
+                        nextNode = nextNode.getNext();
+                    }
                     
                     removeCalled = false;
                     addCalled = false;
@@ -611,8 +615,15 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
                 } else {
                     T previous = prevNode.getElement();
                     index--;
-                    nextNode = prevNode;
-                    prevNode = prevNode.getPrev();
+
+                    if(prevNode == head) { // going to front of list
+                        nextNode = prevNode;
+                        prevNode = null;
+                        head = nextNode;
+                    } else {
+                        nextNode = prevNode;
+                        prevNode = prevNode.getPrev();
+                    }
 
                     prevCalled = true;
                     removeCalled = false;
@@ -648,11 +659,11 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
 
         @Override
         public void remove() {
-            if (addCalled == true) {
+            if (removeCalled == true || addCalled == true) {
                 throw new IllegalStateException();
             } else {
-                if (nextCalled = true) { // 1 element list
-                    if (size == 1) {
+                if (nextCalled = true) { // removing next
+                    if (size == 1) { // 1 element list
                         head = null;
                         tail = null;
                         index--;
@@ -691,14 +702,43 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
                         nextCalled = false;
                         removeCalled = true;
                     }
-                } else if (prevCalled == true) {
-                    prevNode.setNext(nextNode.getNext());
-                    nextNode.getNext().setPrev(prevNode);
-                    size--;
-                    modCount++;
-                    iterModCount++;
-                    prevCalled = false;
-                    removeCalled = true;
+                } else if (prevCalled == true) { // removing previous
+                    if (size == 1) { // 1 element list
+                        head = null;
+                        tail = null;
+                        size--;
+                        modCount++;
+                        iterModCount++;
+                        nextCalled = false;
+                        removeCalled = true;
+                    }
+                    if (index == -1) { // removing from head
+                        head = nextNode.getNext();
+                        nextNode.setNext(null);
+                        head.setPrev(null);
+                        size--;
+                        modCount++;
+                        iterModCount++;
+                        nextCalled = false;
+                        removeCalled = true;
+                    } else if (nextNode == tail) { // removing from tail
+                        tail = prevNode;
+                        prevNode.setNext(null);
+                        nextNode.setPrev(null);
+                        size--;
+                        modCount++;
+                        iterModCount++;
+                        nextCalled = false;
+                        removeCalled = true;
+                    } else {
+                        prevNode.setNext(nextNode.getNext());
+                        nextNode.getNext().setPrev(prevNode);
+                        size--;
+                        modCount++;
+                        iterModCount++;
+                        prevCalled = false;
+                        removeCalled = true;
+                    }
                 } else {
                     throw new IllegalStateException();
                 }
