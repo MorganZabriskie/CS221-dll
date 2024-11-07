@@ -529,6 +529,8 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
         //instance variables
         private boolean nextCalled = false;
         private boolean prevCalled = false;
+        private boolean addCalled = false;
+        private boolean removeCalled = false;
         private Node<T> nextNode;
         private Node<T> prevNode;
         private int iterModCount;
@@ -576,6 +578,8 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
                     prevNode = prevNode.getNext();
                     nextNode = nextNode.getNext();
                     
+                    removeCalled = false;
+                    addCalled = false;
                     nextCalled = true;
                     return next;
                 }
@@ -611,6 +615,8 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
                     prevNode = prevNode.getPrev();
 
                     prevCalled = true;
+                    removeCalled = false;
+                    addCalled = false;
                     return previous;
                 }
             }
@@ -642,8 +648,41 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
 
         @Override
         public void remove() {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'remove'");
+            if (addCalled == true) {
+                throw new IllegalStateException();
+            } else {
+                if (nextCalled = true) {
+                    if (prevNode.getPrev() == null) {
+                        head = nextNode;
+                        nextNode.setPrev(null);
+                        index--;
+                        size--;
+                        modCount++;
+                        iterModCount++;
+                        nextCalled = false;
+                        removeCalled = true;
+                    } else {
+                        prevNode.getPrev().setNext(nextNode);
+                        nextNode.setPrev(prevNode.getPrev());
+                        index--;
+                        size--;
+                        modCount++;
+                        iterModCount++;
+                        nextCalled = false;
+                        removeCalled = true;
+                    }
+                } else if (prevCalled == true) {
+                    prevNode.setNext(nextNode.getNext());
+                    nextNode.getNext().setPrev(prevNode);
+                    size--;
+                    modCount++;
+                    iterModCount++;
+                    prevCalled = false;
+                    removeCalled = true;
+                } else {
+                    throw new IllegalStateException();
+                }
+            }
         }
 
         @Override
