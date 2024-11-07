@@ -421,7 +421,8 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
 
     @Override
     public ListIterator<T> listIterator(int startingIndex) {
-        throw new UnsupportedOperationException();
+        ListIterator<T> newListIterator = new DLLListIterator<T>(startingIndex);
+        return newListIterator;
     }
 
     /** Iterator for IUDoubleLinkedList */
@@ -432,7 +433,9 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
         private int iterModCount;
         private int index = -1;
 
-        /** Creates a new iterator for the list */
+        /** Constructor - creates a new iterator for the list with iterator starting
+         * at index -1
+         */
         public DLLIterator() {
             nextNode = head;
             this.iterModCount = modCount;
@@ -544,217 +547,345 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
             iterModCount = modCount;
         }
 
-        @Override
-        public boolean hasNext() {
-            boolean hasNext = false;
-            if (size == 0) {
-                hasNext = false;
-            } else if (index == -1) {
-                if(head == null) {
-                    hasNext = false;
-                } else {
-                    hasNext = true;
-                }
+        /**
+         * Constructor -creates a new iterator for the list with iterator starting
+         * at index at user given value
+         */
+        public DLLListIterator(int startingIndex) {
+            index = startingIndex;
+            if(startingIndex <= -1) {
+                throw new IndexOutOfBoundsException();
             } else {
-                if (nextNode == null) {
-                    hasNext = false;
+                if(size == 0) {
+                    nextNode = head;
+                    iterModCount = modCount;
                 } else {
-                    hasNext = true;
+                    Node<T> currentNode = head;
+                    for(int i = 0; i < startingIndex; i++) {
+                        currentNode = currentNode.getNext();
+                    }
+                    if(startingIndex > 0) {
+                        nextNode = currentNode.getNext();
+                        prevNode = currentNode;
+                    } else {
+                        nextNode = head;
+                    }
+                    this.iterModCount = modCount;
                 }
             }
-            return hasNext;
+        }
+
+        @Override
+        public boolean hasNext() {
+            if (iterModCount != modCount) {
+                throw new ConcurrentModificationException();
+            } else {
+                boolean hasNext = false;
+                if (size == 0) {
+                    hasNext = false;
+                } else if (index == -1) {
+                    if(head == null) {
+                        hasNext = false;
+                    } else {
+                        hasNext = true;
+                    }
+                } else {
+                    if (nextNode == null) {
+                        hasNext = false;
+                    } else {
+                        hasNext = true;
+                    }
+                }
+                return hasNext;
+            }
         }
 
         @Override
         public T next() {
-            if (size == 0) {
-                throw new NoSuchElementException();
+            if (iterModCount != modCount) {
+                throw new ConcurrentModificationException();
             } else {
-                if (nextNode == null) {
+                if (size == 0) {
                     throw new NoSuchElementException();
                 } else {
-                    T next = nextNode.getElement();
-                    index++;
-                    prevNode = prevNode.getNext();
-                    if(nextNode == tail) { // going to back of list
-                        nextNode = null;
+                    if (nextNode == null) {
+                        throw new NoSuchElementException();
                     } else {
-                        nextNode = nextNode.getNext();
+                        T next = nextNode.getElement();
+                        index++;
+                        prevNode = prevNode.getNext();
+                        if(nextNode == tail) { // going to back of list
+                            nextNode = null;
+                        } else {
+                            nextNode = nextNode.getNext();
+                        }
+                        
+                        removeCalled = false;
+                        addCalled = false;
+                        nextCalled = true;
+                        return next;
                     }
-                    
-                    removeCalled = false;
-                    addCalled = false;
-                    nextCalled = true;
-                    return next;
                 }
             }
         }
 
         @Override
         public boolean hasPrevious() {
-            boolean hasPrevious = false;
-            if (index == -1) {
-                hasPrevious = false;
+            if (iterModCount != modCount) {
+                throw new ConcurrentModificationException();
             } else {
-                if(prevNode == null) {
+                boolean hasPrevious = false;
+                if(size == 0) {
+                    hasPrevious = false;
+                } else if (index == -1) {
                     hasPrevious = false;
                 } else {
-                    hasPrevious = true;
+                    if(prevNode == null) {
+                        hasPrevious = false;
+                    } else {
+                        hasPrevious = true;
+                    }
                 }
+                return hasPrevious;
             }
-            return hasPrevious;
         }
 
         @Override
         public T previous() {
-            if(size == 0) {
-                throw new NoSuchElementException();
+            if (iterModCount != modCount) {
+                throw new ConcurrentModificationException();
             } else {
-                if (prevNode == null) {
+                if(size == 0) {
                     throw new NoSuchElementException();
                 } else {
-                    T previous = prevNode.getElement();
-                    index--;
-
-                    if(prevNode == head) { // going to front of list
-                        nextNode = prevNode;
-                        prevNode = null;
-                        head = nextNode;
+                    if (prevNode == null) {
+                        throw new NoSuchElementException();
                     } else {
-                        nextNode = prevNode;
-                        prevNode = prevNode.getPrev();
-                    }
+                        T previous = prevNode.getElement();
+                        index--;
 
-                    prevCalled = true;
-                    removeCalled = false;
-                    addCalled = false;
-                    return previous;
+                        if(prevNode == head) { // going to front of list
+                            nextNode = prevNode;
+                            prevNode = null;
+                            head = nextNode;
+                        } else {
+                            nextNode = prevNode;
+                            prevNode = prevNode.getPrev();
+                        }
+
+                        prevCalled = true;
+                        removeCalled = false;
+                        addCalled = false;
+                        return previous;
+                    }
                 }
             }
         }
 
         @Override
         public int nextIndex() {
-            int nextIndex;
-            if (nextNode == null) {
-                nextIndex = size;
+            if (iterModCount != modCount) {
+                throw new ConcurrentModificationException();
             } else {
-                nextIndex = index + 1;
-            }
+                int nextIndex;
+                if (nextNode == null) {
+                    nextIndex = size;
+                } else {
+                    nextIndex = index + 1;
+                }
 
-            return nextIndex;
+                return nextIndex;
+            }
         }
 
         @Override
         public int previousIndex() {
-            int prevIndex;
-            if (prevNode == null) {
-                prevIndex = -1;
+            if (iterModCount != modCount) {
+                throw new ConcurrentModificationException();
             } else {
-                prevIndex = index;
-            }
+                int prevIndex;
+                if (prevNode == null) {
+                    prevIndex = -1;
+                } else {
+                    prevIndex = index;
+                }
 
-            return prevIndex;
+                return prevIndex;
+            }
         }
 
         @Override
         public void remove() {
-            if (removeCalled == true || addCalled == true) {
-                throw new IllegalStateException();
+            if (iterModCount != modCount) {
+                throw new ConcurrentModificationException();
             } else {
-                if (nextCalled = true) { // removing next
-                    if (size == 1) { // 1 element list
-                        head = null;
-                        tail = null;
-                        index--;
-                        size--;
-                        modCount++;
-                        iterModCount++;
-                        nextCalled = false;
-                        removeCalled = true;
-                    }
-                    if (prevNode.getPrev() == null) { // removing from head
-                        head = nextNode;
-                        nextNode.setPrev(null);
-                        index--;
-                        size--;
-                        modCount++;
-                        iterModCount++;
-                        nextCalled = false;
-                        removeCalled = true;
-                    } else if (nextNode == null) { // removing from tail
-                        tail = prevNode.getPrev();
-                        prevNode.getPrev().setNext(null);
-                        index--;
-                        size--;
-                        modCount++;
-                        iterModCount++;
-                        nextCalled = false;
-                        removeCalled = true;
-                    } 
-                    else {
-                        prevNode.getPrev().setNext(nextNode);
-                        nextNode.setPrev(prevNode.getPrev());
-                        index--;
-                        size--;
-                        modCount++;
-                        iterModCount++;
-                        nextCalled = false;
-                        removeCalled = true;
-                    }
-                } else if (prevCalled == true) { // removing previous
-                    if (size == 1) { // 1 element list
-                        head = null;
-                        tail = null;
-                        size--;
-                        modCount++;
-                        iterModCount++;
-                        nextCalled = false;
-                        removeCalled = true;
-                    }
-                    if (index == -1) { // removing from head
-                        head = nextNode.getNext();
-                        nextNode.setNext(null);
-                        head.setPrev(null);
-                        size--;
-                        modCount++;
-                        iterModCount++;
-                        nextCalled = false;
-                        removeCalled = true;
-                    } else if (nextNode == tail) { // removing from tail
-                        tail = prevNode;
-                        prevNode.setNext(null);
-                        nextNode.setPrev(null);
-                        size--;
-                        modCount++;
-                        iterModCount++;
-                        nextCalled = false;
-                        removeCalled = true;
-                    } else {
-                        prevNode.setNext(nextNode.getNext());
-                        nextNode.getNext().setPrev(prevNode);
-                        size--;
-                        modCount++;
-                        iterModCount++;
-                        prevCalled = false;
-                        removeCalled = true;
-                    }
-                } else {
+                if (removeCalled == true || addCalled == true || size == 0) {
                     throw new IllegalStateException();
+                } else {
+                    if (nextCalled = true) { // removing next
+                        if (size == 1) { // 1 element list
+                            head = null;
+                            tail = null;
+                            prevNode = null;
+                            index--;
+                            size--;
+                            modCount++;
+                            iterModCount++;
+                            nextCalled = false;
+                            removeCalled = true;
+                        }
+                        if (index == 0) { // removing from head
+                            head = nextNode;
+                            nextNode.setPrev(null);
+                            prevNode = null;
+                            index--;
+                            size--;
+                            modCount++;
+                            iterModCount++;
+                            nextCalled = false;
+                            removeCalled = true;
+                        } else if (nextNode == null) { // removing from tail
+                            tail = prevNode.getPrev();
+                            prevNode.getPrev().setNext(null);
+                            prevNode = prevNode.getPrev();
+                            index--;
+                            size--;
+                            modCount++;
+                            iterModCount++;
+                            nextCalled = false;
+                            removeCalled = true;
+                        } 
+                        else {
+                            prevNode.getPrev().setNext(nextNode);
+                            nextNode.setPrev(prevNode.getPrev());
+                            prevNode = prevNode.getPrev();
+                            index--;
+                            size--;
+                            modCount++;
+                            iterModCount++;
+                            nextCalled = false;
+                            removeCalled = true;
+                        }
+                    } else if (prevCalled == true) { // removing previous
+                        if (size == 1) { // 1 element list
+                            head = null;
+                            tail = null;
+                            nextNode = null;
+                            size--;
+                            modCount++;
+                            iterModCount++;
+                            prevCalled = false;
+                            removeCalled = true;
+                        }
+                        if (index == -1) { // removing from head
+                            head = nextNode.getNext();
+                            nextNode.setNext(null);
+                            head.setPrev(null);
+                            nextNode = head;
+                            size--;
+                            modCount++;
+                            iterModCount++;
+                            prevCalled = false;
+                            removeCalled = true;
+                        } else if (nextNode == tail) { // removing from tail
+                            tail = prevNode;
+                            prevNode.setNext(null);
+                            nextNode.setPrev(null);
+                            nextNode = null;
+                            size--;
+                            modCount++;
+                            iterModCount++;
+                            prevCalled = false;
+                            removeCalled = true;
+                        } else {
+                            prevNode.setNext(nextNode.getNext());
+                            nextNode.getNext().setPrev(prevNode);
+                            nextNode = nextNode.getNext();
+                            size--;
+                            modCount++;
+                            iterModCount++;
+                            prevCalled = false;
+                            removeCalled = true;
+                        }
+                    } else { // neither next or previous was called
+                        throw new IllegalStateException();
+                    }
                 }
             }
         }
 
         @Override
         public void set(T e) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'set'");
+            if (iterModCount != modCount) {
+                throw new ConcurrentModificationException();
+            } else {
+                if(removeCalled == true || addCalled == true) {
+                    throw new IllegalStateException();
+                } else {
+                    if (nextCalled == true) { // setting next element
+                        prevNode.setElement(e);
+                        iterModCount++;
+                        modCount++;
+                    } else if (prevCalled == true) { // setting previous element
+                        nextNode.setElement(e);
+                        iterModCount++;
+                        modCount++;
+                    } else { // neither next or previous was called
+                        throw new IllegalStateException();
+                    }
+                }
+            }
         }
 
         @Override
         public void add(T e) {
-            // TODO Auto-generated method stub
-            throw new UnsupportedOperationException("Unimplemented method 'add'");
+            if (iterModCount != modCount) {
+                throw new ConcurrentModificationException();
+            } else {
+                if(size == 0) { // empty list
+                    Node<T> newNode = new Node<T>(e);
+                    head = newNode;
+                    tail = newNode;
+                    index++;
+                    iterModCount++;
+                    modCount++;
+                    addCalled = true;
+                } else if (nextNode == head) { // adding at head
+                    Node<T> newNode = new Node<T>(e);
+                    newNode.setNext(head);
+                    head.setPrev(newNode);
+                    head = newNode;
+                    prevNode = newNode;
+                    index++;
+                    size++;
+                    iterModCount++;
+                    modCount++;
+                    addCalled = true;
+                } else if (prevNode == tail) { // adding at tail
+                    Node<T> newNode = new Node<T>(e);
+                    newNode.setPrev(tail);
+                    tail.setNext(newNode);
+                    tail = newNode;
+                    prevNode = newNode;
+                    index++;
+                    size++;
+                    iterModCount++;
+                    modCount++;
+                    addCalled = true;
+                } else { // adding in middle of list
+                    Node<T> newNode = new Node<T>(e);
+                    newNode.setPrev(prevNode);
+                    newNode.setNext(nextNode);
+                    prevNode.setNext(newNode);
+                    nextNode.setPrev(newNode);
+                    prevNode = newNode;
+                    index++;
+                    size++;
+                    iterModCount++;
+                    modCount++;
+                    addCalled = true;
+                }
+            }
         }
     }
 }
