@@ -651,8 +651,18 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
             if (addCalled == true) {
                 throw new IllegalStateException();
             } else {
-                if (nextCalled = true) {
-                    if (prevNode.getPrev() == null) {
+                if (nextCalled = true) { // 1 element list
+                    if (size == 1) {
+                        head = null;
+                        tail = null;
+                        index--;
+                        size--;
+                        modCount++;
+                        iterModCount++;
+                        nextCalled = false;
+                        removeCalled = true;
+                    }
+                    if (prevNode.getPrev() == null) { // removing from head
                         head = nextNode;
                         nextNode.setPrev(null);
                         index--;
@@ -661,7 +671,17 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
                         iterModCount++;
                         nextCalled = false;
                         removeCalled = true;
-                    } else {
+                    } else if (nextNode == null) { // removing from tail
+                        tail = prevNode.getPrev();
+                        prevNode.getPrev().setNext(null);
+                        index--;
+                        size--;
+                        modCount++;
+                        iterModCount++;
+                        nextCalled = false;
+                        removeCalled = true;
+                    } 
+                    else {
                         prevNode.getPrev().setNext(nextNode);
                         nextNode.setPrev(prevNode.getPrev());
                         index--;
