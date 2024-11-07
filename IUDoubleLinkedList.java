@@ -553,7 +553,7 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
          */
         public DLLListIterator(int startingIndex) {
             index = startingIndex;
-            if(startingIndex <= -1) {
+            if(startingIndex <= -1 || startingIndex > size) {
                 throw new IndexOutOfBoundsException();
             } else {
                 if(size == 0) {
@@ -564,11 +564,12 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
                     for(int i = 0; i < startingIndex; i++) {
                         currentNode = currentNode.getNext();
                     }
-                    if(startingIndex > 0) {
-                        nextNode = currentNode.getNext();
+                    if(index == size) {
+                        nextNode = null;
                         prevNode = currentNode;
                     } else {
-                        nextNode = head;
+                        nextNode = currentNode.getNext();
+                        prevNode = currentNode;
                     }
                     this.iterModCount = modCount;
                 }
@@ -608,15 +609,16 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
                 if (size == 0) {
                     throw new NoSuchElementException();
                 } else {
-                    if (nextNode == null) {
+                    if (!hasNext()) {
                         throw new NoSuchElementException();
                     } else {
                         T next = nextNode.getElement();
                         index++;
-                        prevNode = prevNode.getNext();
                         if(nextNode == tail) { // going to back of list
+                            prevNode = nextNode;
                             nextNode = null;
                         } else {
+                            prevNode = nextNode;
                             nextNode = nextNode.getNext();
                         }
                         
@@ -733,8 +735,7 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
                             iterModCount++;
                             nextCalled = false;
                             removeCalled = true;
-                        }
-                        if (index == 0) { // removing from head
+                        }else if (index == 0) { // removing from head
                             head = nextNode;
                             nextNode.setPrev(null);
                             prevNode = null;
@@ -776,8 +777,7 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
                             iterModCount++;
                             prevCalled = false;
                             removeCalled = true;
-                        }
-                        if (index == -1) { // removing from head
+                        } else if (index == -1) { // removing from head
                             head = nextNode.getNext();
                             nextNode.setNext(null);
                             head.setPrev(null);
@@ -819,7 +819,7 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
             if (iterModCount != modCount) {
                 throw new ConcurrentModificationException();
             } else {
-                if(removeCalled == true || addCalled == true) {
+                if(removeCalled == true || addCalled == true || size == 0) {
                     throw new IllegalStateException();
                 } else {
                     if (nextCalled == true) { // setting next element
