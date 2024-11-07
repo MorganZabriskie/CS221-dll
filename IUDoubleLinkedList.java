@@ -716,4 +716,5 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
             // TODO Auto-generated method stub
             throw new UnsupportedOperationException("Unimplemented method 'add'");
         }
+    }
 }
