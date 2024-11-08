@@ -552,26 +552,26 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
          * at index at user given value
          */
         public DLLListIterator(int startingIndex) {
-            index = startingIndex;
-            if(startingIndex <= -1 || startingIndex > size) {
+            if(startingIndex < 0 || startingIndex > size) {
                 throw new IndexOutOfBoundsException();
             } else {
-                if(size == 0) {
+                if(startingIndex == 0) {
+                    index = -1;
                     nextNode = head;
                     iterModCount = modCount;
                 } else {
-                    Node<T> currentNode = head;
-                    for(int i = 0; i < startingIndex; i++) {
-                        currentNode = currentNode.getNext();
-                    }
-                    if(index == size) {
-                        nextNode = null;
-                        prevNode = currentNode;
-                    } else {
-                        nextNode = currentNode.getNext();
-                        prevNode = currentNode;
-                    }
-                    this.iterModCount = modCount;
+                        Node<T> currentNode = head;
+                        for(int i = 0; i < startingIndex; i++) {
+                            currentNode = currentNode.getNext();
+                        }
+                        index = startingIndex - 1;
+                        nextNode = currentNode;
+                        if(currentNode == head) {
+                            prevNode = null;
+                        } else {
+                            prevNode = currentNode.getPrev();
+                        }
+                        iterModCount = modCount;
                 }
             }
         }
