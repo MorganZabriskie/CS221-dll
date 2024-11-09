@@ -565,10 +565,14 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
                             currentNode = currentNode.getNext();
                         }
                         index = startingIndex - 1;
-                        nextNode = currentNode;
                         if(currentNode == head) {
                             prevNode = null;
+                            nextNode = currentNode;
+                        } else if (currentNode == null)  {
+                            nextNode = null;
+                            prevNode = tail;
                         } else {
+                            nextNode = currentNode;
                             prevNode = currentNode.getPrev();
                         }
                         iterModCount = modCount;
@@ -671,7 +675,12 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
                             nextNode = prevNode;
                             prevNode = null;
                             head = nextNode;
-                        } else {
+                        } else if (prevNode == tail) {
+                            nextNode = prevNode;
+                            prevNode = prevNode.getPrev();
+                            tail = nextNode;
+                        }
+                        else {
                             nextNode = prevNode;
                             prevNode = prevNode.getPrev();
                         }
@@ -692,8 +701,8 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
                 throw new ConcurrentModificationException();
             } else {
                 int nextIndex;
-                if (nextNode == null) {
-                    nextIndex = size;
+                if(size == 0) {
+                    nextIndex = 0;
                 } else {
                     nextIndex = index + 1;
                 }
@@ -723,98 +732,101 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
             if (iterModCount != modCount) {
                 throw new ConcurrentModificationException();
             } else {
-                if (removeCalled == true || addCalled == true || size == 0) {
+                 if (nextCalled == false && prevCalled == false) {
                     throw new IllegalStateException();
-                } else {
-                    if (nextCalled = true) { // removing next
-                        if (size == 1) { // 1 element list
-                            head = null;
-                            tail = null;
-                            prevNode = null;
-                            index--;
-                            size--;
-                            modCount++;
-                            iterModCount++;
-                            nextCalled = false;
-                            removeCalled = true;
-                        }else if (index == 0) { // removing from head
-                            head = nextNode;
-                            nextNode.setPrev(null);
-                            prevNode = null;
-                            index--;
-                            size--;
-                            modCount++;
-                            iterModCount++;
-                            nextCalled = false;
-                            removeCalled = true;
-                        } else if (nextNode == null) { // removing from tail
-                            tail = prevNode.getPrev();
-                            prevNode.getPrev().setNext(null);
-                            prevNode = prevNode.getPrev();
-                            index--;
-                            size--;
-                            modCount++;
-                            iterModCount++;
-                            nextCalled = false;
-                            removeCalled = true;
-                        } 
-                        else {
-                            prevNode.getPrev().setNext(nextNode);
-                            nextNode.setPrev(prevNode.getPrev());
-                            prevNode = prevNode.getPrev();
-                            index--;
-                            size--;
-                            modCount++;
-                            iterModCount++;
-                            nextCalled = false;
-                            removeCalled = true;
-                        }
-                    } else if (prevCalled == true) { // removing previous
-                        if (size == 1) { // 1 element list
-                            head = null;
-                            tail = null;
-                            nextNode = null;
-                            size--;
-                            modCount++;
-                            iterModCount++;
-                            prevCalled = false;
-                            removeCalled = true;
-                        } else if (index == -1) { // removing from head
-                            head = nextNode.getNext();
-                            nextNode.setNext(null);
-                            head.setPrev(null);
-                            nextNode = head;
-                            size--;
-                            modCount++;
-                            iterModCount++;
-                            prevCalled = false;
-                            removeCalled = true;
-                        } else if (nextNode == tail) { // removing from tail
-                            tail = prevNode;
-                            prevNode.setNext(null);
-                            nextNode.setPrev(null);
-                            nextNode = null;
-                            size--;
-                            modCount++;
-                            iterModCount++;
-                            prevCalled = false;
-                            removeCalled = true;
-                        } else {
-                            prevNode.setNext(nextNode.getNext());
-                            nextNode.getNext().setPrev(prevNode);
-                            nextNode = nextNode.getNext();
-                            size--;
-                            modCount++;
-                            iterModCount++;
-                            prevCalled = false;
-                            removeCalled = true;
-                        }
-                    } else { // neither next or previous was called
+                 } else {
+                    if (removeCalled || addCalled) {
                         throw new IllegalStateException();
+                    } else {
+                        if(nextCalled) {
+                            if (size == 1) {
+                                head = null;
+                                tail = null;
+                                prevNode = null;
+                                nextNode = null;
+                                index--;
+                                size--;
+                                modCount++;
+                                iterModCount++;
+                                removeCalled = true;
+                                nextCalled = false;
+                            } else if(prevNode == head) {
+                                nextNode.setPrev(null);
+                                prevNode = null;
+                                head = nextNode;
+                                index--;
+                                size--;
+                                modCount++;
+                                iterModCount++;
+                                removeCalled = true;
+                                nextCalled = false;
+                            } else if(prevNode == tail) {
+                                prevNode.getPrev().setNext(null);
+                                prevNode = prevNode.getPrev();
+                                tail = prevNode;
+                                index--;
+                                size--;
+                                modCount++;
+                                iterModCount++;
+                                removeCalled = true;
+                                nextCalled = false;
+                            } else {
+                                prevNode.getPrev().setNext(nextNode);
+                                prevNode = prevNode.getPrev();
+                                nextNode.setPrev(prevNode);
+                                index--;
+                                size--;
+                                modCount++;
+                                iterModCount++;
+                                removeCalled = true;
+                                nextCalled = false;
+                            }
+                        } else if (prevCalled) {
+                            if (size == 1) {
+                                head = null;
+                                tail = null;
+                                prevNode = null;
+                                nextNode = null;
+                                size--;
+                                modCount++;
+                                iterModCount++;
+                                removeCalled = true;
+                                prevCalled = false;
+                            } else if (nextNode == head) {
+                                nextNode.getNext().setPrev(null);
+                                prevNode = null;
+                                nextNode = nextNode.getNext();
+                                head = nextNode;
+                                size--;
+                                modCount++;
+                                iterModCount++;
+                                removeCalled = true;
+                                prevCalled = false;
+                            } else if (nextNode == tail) {
+                                prevNode.setNext(null);
+                                nextNode = null;
+                                tail = prevNode;
+                                size--;
+                                modCount++;
+                                iterModCount++;
+                                removeCalled = true;
+                                prevCalled = false;
+                            } else {
+                                prevNode.setNext(nextNode.getNext());
+                                nextNode = nextNode.getNext();
+                                nextNode.setPrev(prevNode);
+                                size--;
+                                modCount++;
+                                iterModCount++;
+                                removeCalled = true;
+                                prevCalled = false;
+                            }
+                        } 
                     }
-                }
+                 }
             }
         }
+            
 
         @Override
         public void set(T e) {
@@ -852,6 +864,8 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
                     iterModCount++;
                     modCount++;
                     addCalled = true;
+                    nextCalled = false;
+                    prevCalled = false;
                 } else if (nextNode == head) { // adding at head
                     Node<T> newNode = new Node<T>(e);
                     newNode.setNext(head);
@@ -863,6 +877,8 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
                     iterModCount++;
                     modCount++;
                     addCalled = true;
+                    nextCalled = false;
+                    prevCalled = false;
                 } else if (prevNode == tail) { // adding at tail
                     Node<T> newNode = new Node<T>(e);
                     newNode.setPrev(tail);
@@ -874,6 +890,8 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
                     iterModCount++;
                     modCount++;
                     addCalled = true;
+                    nextCalled = false;
+                    prevCalled = false;
                 } else { // adding in middle of list
                     Node<T> newNode = new Node<T>(e);
                     newNode.setPrev(prevNode);
@@ -886,6 +904,8 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
                     iterModCount++;
                     modCount++;
                     addCalled = true;
+                    nextCalled = false;
+                    prevCalled = false;
                 }
             }
         }
