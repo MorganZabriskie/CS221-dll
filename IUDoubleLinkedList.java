@@ -861,6 +861,7 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
                     head = newNode;
                     tail = newNode;
                     index++;
+                    size++;
                     prevNode = newNode;
                     nextNode = null;
                     iterModCount++;
