@@ -13,6 +13,7 @@ import java.util.ConcurrentModificationException;
  * 
  * @param <T> type to store
  */
+
 public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
     private Node<T> head, tail;
     private int size;
@@ -527,7 +528,8 @@ public class IUDoubleLinkedList<T> implements IndexedUnsortedList<T> {
             }
         }
     }
-
+    
+    /** List Iterator for IUDoubleLinkedList */
     private class DLLListIterator<E extends T> implements ListIterator<T> {
         //instance variables
         private boolean nextCalled = false;

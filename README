@@ -1,0 +1,97 @@
+****************
+* Double Linked List
+* CS 221
+* 11/8/24
+* Morgan Zabriskie
+**************** 
+
+OVERVIEW:
+
+This program creates an indexed unsorted list using a double
+linked node implementation and tests functionality. The program 
+supports both an iterator and a list iterator.
+
+
+INCLUDED FILES:
+ * IndexedUnsortedList.java - list interface
+ * IUDoubleLinkedList.java - implementation of list
+ * ListTester.java - test file
+ * Node.java - node class file
+ * README - this file
+
+
+COMPILING AND RUNNING:
+ From the directory containing all source files, compile the
+ driver class (and all dependencies) with the command:
+ $ javac *.java
+
+ Run the compiled class file with the command:
+ $ java ListTester
+
+ Console output will give the results of the tests after the program finishes.
+
+
+PROGRAM DESIGN AND IMPORTANT CONCEPTS:
+
+The implementation of the Indexed Unsorted List interface is in the 
+IUDoubleLinkedList class. This class uses double linked nodes (the
+node class can be found in Node.java) to create a list of elements.
+The user can use an iterator or a list iterator to traverse the list
+and make changes as desired.
+
+The IUDoubleLinkedList class has several methods for interacting with
+the list, like add, remove, set, and get. It also has two private inner
+classes, Iterator and ListIterator to interact with the list.
+
+This implementation uses double linked nodes to form the list. The list
+starts with a head and ends with a tail, and each node has a reference
+to the node before it and after it. This makes accessing elements in the
+list fairly easy, and it makes adding and removing elements very easy (as
+compared to an array based implementation).
+
+
+TESTING:
+
+To test the list implementation, we have created a ListTester driver class.
+This class has several change scenarios to account for many different kinds of
+changes that could be made to the list using class methods, iterator methods, 
+and list iterator methods.
+
+The tester class also includes example tests to be done depending on the final
+size of the list. Edge cases, like adding at the beginning, end, or trying to
+add at an index outside of the acceptable bounds, are all included.
+
+Finally, the tester class also includes concurrency tests for both iterator and
+list iterator to ensure that the iterator will 'fail fast' if something else makes
+a change to the list.
+
+
+DISCUSSION:
+
+It has been really interesting working on this assignment (or some version of it) over
+the last several weeks. Doing the same task but using different implementations (array,
+single linked list, double linked list), has really solidified for me the differences
+between them. For example, writing a remove method got progressively easier as we added
+the ability to not have to shift elements, then being able to traverse the list both
+forwards and backwards.
+
+Starting with the tests was also a good way to understand what the program should be doing
+and it helped me troubleshoot issues more easily, because I really understood what should
+be happening. If something wasn't working, I had a better idea of where to start looking 
+for the issue.
+
+I think these assignments have made me better at writing code quicker, and thinking about all
+the edge cases that my methods should account for. The first time with the arrays I forgot
+about almost all the edge cases and had to slowly add them as I troubleshot my program. By the
+time I did double linked list, I was adding in the edge cases as I wrote it and the 
+program pretty much worked correctly the first time around.
+
+Writing the list iterator was probably some of the most challenging programming I've
+done so far. The logic in the remove method was especially challenging and I ended up
+having to write it twice to get it right. Keeping track of what 'prevNode' and 'nextNode' were
+was challenging but a good puzzle. The null pointer errors were really annoying, but
+very satisfying when they were finally all fixed.
+
+Overall I'v enjoyed the format of these assignments and I feel like the progression has
+helped me better learn the differences between array, sll, dll, and the importance of 
+setting up good testing methods.
