@@ -252,6 +252,10 @@ public class ListTester {
 		testThreeElementList(ABC_set2D_ABD, "ABC_set2D_ABD", LIST_ABD, STRING_ABD);
 		testThreeElementList(ABC_listIterNextSetD_DBC, "ABC_listIterNextSetD_DBC", LIST_DBC, STRING_DBC);
 		testThreeElementList(ABC_listIterNextPrevSetD_DBC, "ABC_listIterNextPrevSetD_DBC", LIST_DBC, STRING_DBC);
+		testThreeElementList(ABC_listIterNextNextSetD_ADC, "ABC_listIterNextNextSetD_ADC", LIST_ADC, STRING_ADC);
+		testThreeElementList(ABC_listIterNextNextPrevSetD_ADC, "ABC_listIterNextNextPrevSetD_ADC", LIST_ADC, STRING_ADC);
+		testThreeElementList(ABC_listIterNextNextNextSetD_ABD, "ABC_listIterNextNextNextSetD_ABD", LIST_ABD, STRING_ABD);
+		testThreeElementList(ABC_listIterNextNextNextPrevSetD_ABD, "ABC_listIterNextNextNextPrevSetD_ABD", LIST_ABD,STRING_ABD);
 		//Iterator concurrency tests
 		test_IterConcurrency();
 		if (SUPPORTS_LIST_ITERATOR) {
@@ -1379,6 +1383,78 @@ public class ListTester {
 		return list;
 	}
 	private Scenario<Integer> ABC_listIterNextPrevSetD_DBC = () -> ABC_listIterNextPrevSetD_DBC();
+
+	/**
+	 * Scenario: [A,B,C] -> list iter next, next, set(D) -> [A,D,C]
+	 * 
+	 * @return [A,D,C] after list iter next, next, set(D)
+	 */
+	private IndexedUnsortedList<Integer> ABC_listIterNextNextSetD_ADC() {
+		IndexedUnsortedList<Integer> list = emptyList_addToFrontA_A();
+		list.addToRear(ELEMENT_B);
+		list.addToRear(ELEMENT_C);
+		ListIterator<Integer> it = list.listIterator();
+		it.next();
+		it.next();
+		it.set(ELEMENT_D);
+		return list;
+	}
+	private Scenario<Integer> ABC_listIterNextNextSetD_ADC = () -> ABC_listIterNextNextSetD_ADC();
+
+	/**
+	 * Scenario: [A,B,C] -> list iter next, next, prev, set(D) -> [A,D,C]
+	 * 
+	 * @return [A,D,C] after list iter next, next, prev, set(D)
+	 */
+	private IndexedUnsortedList<Integer> ABC_listIterNextNextPrevSetD_ADC() {
+		IndexedUnsortedList<Integer> list = emptyList_addToFrontA_A();
+		list.addToRear(ELEMENT_B);
+		list.addToRear(ELEMENT_C);
+		ListIterator<Integer> it = list.listIterator();
+		it.next();
+		it.next();
+		it.previous();
+		it.set(ELEMENT_D);
+		return list;
+	}
+	private Scenario<Integer> ABC_listIterNextNextPrevSetD_ADC = () -> ABC_listIterNextNextPrevSetD_ADC();
+
+	/**
+	 * Scenario: [A,B,C] -> list iter next, next, next, set(D) -> [A,B,D]
+	 * 
+	 * @return [A,B,D] after list iter next, next, next, set(D)
+	 */
+	private IndexedUnsortedList<Integer> ABC_listIterNextNextNextSetD_ABD() {
+		IndexedUnsortedList<Integer> list = emptyList_addToFrontA_A();
+		list.addToRear(ELEMENT_B);
+		list.addToRear(ELEMENT_C);
+		ListIterator<Integer> it = list.listIterator();
+		it.next();
+		it.next();
+		it.next();
+		it.set(ELEMENT_D);
+		return list;
+	}
+	private Scenario<Integer> ABC_listIterNextNextNextSetD_ABD = () -> ABC_listIterNextNextNextSetD_ABD();
+
+	/**
+	 * Scenario: [A,B,C] -> list iter next, next, next, prev, set(D) -> [A,B,D]
+	 * 
+	 * @return [A,B,D] after list iter next, next, next, prev, set(D)
+	 */
+	private IndexedUnsortedList<Integer> ABC_listIterNextNextNextPrevSetD_ABD() {
+		IndexedUnsortedList<Integer> list = emptyList_addToFrontA_A();
+		list.addToRear(ELEMENT_B);
+		list.addToRear(ELEMENT_C);
+		ListIterator<Integer> it = list.listIterator();
+		it.next();
+		it.next();
+		it.next();
+		it.previous();
+		it.set(ELEMENT_D);
+		return list;
+	}
+	private Scenario<Integer> ABC_listIterNextNextNextPrevSetD_ABD = () -> ABC_listIterNextNextNextPrevSetD_ABD();
 
 	/////////////////////////////////
 	//XXX Tests for 0-element list
